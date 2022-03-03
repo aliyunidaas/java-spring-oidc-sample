@@ -1,0 +1,21 @@
+server:
+    port: 8080
+    servlet:
+        context-path: /  # baseUrl
+logging:
+    level:
+        root: DEBUG
+        org.springframework.web: DEBUG
+        org.springframework.security: DEBUG
+        org.springframework.security.oauth2: DEBUG
+spring:
+    security:
+        oauth2:
+            client:
+                registration:
+                    aliyunidaas:  # aliyunidaas 即为 {registrationId}, 可为任意字符串
+                        client-id: <clientId> # idaas 中拿到的 client-id
+                        client-secret: <clientSecret> # idaas 中拿到的 client-secret
+                provider:
+                    aliyunidaas:  # aliyunidaas 即为 {registrationId}, 可为任意字符串
+                        issuer-uri: <issuer> # idaas 中拿到的 issuer
