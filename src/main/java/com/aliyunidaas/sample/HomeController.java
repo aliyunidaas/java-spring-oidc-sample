@@ -10,4 +10,9 @@ public class HomeController {
     public String index() {
         return "index";
     }
+
+    @GetMapping("/logout-success")
+    public String logoutSuccess() {
+        return "logout-success";
+    }
 }

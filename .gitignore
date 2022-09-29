@@ -4,6 +4,7 @@ target/
 # ---> Java
 # Compiled class file
 *.class
+*.ignore_in_git
 
 # Log file
 *.log

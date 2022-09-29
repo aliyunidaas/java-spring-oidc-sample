@@ -17,6 +17,8 @@ spring:
                     aliyunidaas: # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         client-id:  # idaas 中拿到的 client-id
                         client-secret:  # idaas 中拿到的 client-secret
+                        scope:
+                          - openid
                 provider:
                     aliyunidaas: # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         issuer-uri:  # idaas 中拿到的 issuer
@@ -26,7 +28,7 @@ spring:
 ![img-2022030202.png](pics/image-2022030202.png)
 ![img-2022030202.png](pics/image-2022030203.png)
 
-## 第三步：在 idaas 中添加 RP 重定向地址
+## 第三步：在 IDaaS 中添加 RP 重定向地址
 
 - 本地启动项目
 - 按照以下规则获取重定向地址 redirect_uri，并填写到 idaas 中。
@@ -34,22 +36,28 @@ spring:
 
 ![img-2022030204.png](pics/image-2022030204.png)
 
-## 第四步：授权(可选)
+## 第四步：配置登出重定向地址
+
+![image-2022092109.png](pics/image-2022092109.png)
+
+## 第五步：授权(可选)
 
 ![image-2022030205.png](pics/image-2022030205.png)
 
 - 如图所示，在应用中为某一用户授权
 
-## 第五步：访问
+## 第六步：访问
 
 - 访问 `http://localhost:8080`
 - 此时会跳转到登录认证页面
 
-<img src="pics/image-2022030207.png" alt="image-2022030207" style="zoom: 33%;" />
+![image-2022030207.png](pics/image-2022030207.png)
 
 - 登录认证成功后会跳转回 `http://localhost:8080` ，并显示以下页面
 
 ![image-20220126151016575](pics/image-2022030206.png)
+
+通过点击 [Logout] 可以退出 IDaaS 会话
 
 # 详细实现
 
@@ -61,11 +69,11 @@ spring:
 
 ### 依赖项
 
-- 使用 SpringBoot 版本为 2.4.1，其余依赖都使用 spring-boot-dependencies 中的默认版本号
+- 使用 SpringBoot 版本为 2.7.3，其余依赖都使用 spring-boot-dependencies 中的默认版本号
 
 - OIDC 依赖
 
-  ```xml
+```xml
   <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -74,43 +82,42 @@ spring:
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-openid</artifactId>
   </dependency>
-  ```
+```
 
 - security 相关依赖
 
-  ```xml
+```xml
   <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
   </dependency>
-  ```
+```
 - web 相关
 
-  ```xml
+```xml
   <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
   </dependency>
-  ```
+```
 -
     - thymeleaf 相关依赖
 
 ```xml
-
 <dependency>
     <groupId>org.thymeleaf.extras</groupId>
     <artifactId>thymeleaf-extras-springsecurity5</artifactId>
 </dependency>
 
 <dependency>
-<groupId>org.springframework.boot</groupId>
-<artifactId>spring-boot-starter-thymeleaf</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
 </dependency>
 ```
 
 - 日志相关，切换 logback 为 log4j2
 
-  ```xml
+```xml
   <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -125,7 +132,7 @@ spring:
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-log4j2</artifactId>
   </dependency>
-  ```
+```
 
 ### 保护路径配置
 
@@ -139,9 +146,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/logout-success").permitAll()
                 .anyRequest().authenticated()
-                .and()
-                .oauth2Login();
+                .and().logout().logoutSuccessUrl("/logout-success")
+                .and().logout().logoutSuccessHandler(oidcLogoutSuccessHandler())
+                .and().oauth2Login();
     }
 }
 ```
@@ -155,7 +164,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>Spring Security SAML2</title>
+    <title>Spring Security OIDC</title>
 </head>
 <body style="background-color: aquamarine;">
 <h1>OIDC Login Example with Spring Security 5.2</h1>
@@ -220,6 +229,8 @@ spring:
                     aliyunidaas: # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         client-id: <clientId>  # idaas 中拿到的 client-id
                         client-secret: <clientSecret> # idaas 中拿到的 client-secret
+                        scope:
+                          - openid
                 provider:
                     aliyunidaas: # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         issuer-uri: <issuer> # idaas 中拿到的 issuer
@@ -243,6 +254,8 @@ spring:
                     aliyunidaas: # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         client-id:  # idaas 中拿到的 client-id
                         client-secret:  # idaas 中拿到的 client-secret
+                        scope:
+                          - openid
                 provider:
                     aliyunidaas: # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         issuer-uri:  # idaas 中拿到的 issuer

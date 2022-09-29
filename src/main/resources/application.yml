@@ -16,6 +16,8 @@ spring:
                     aliyunidaas:  # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         client-id: <clientId> # idaas 中拿到的 client-id
                         client-secret: <clientSecret> # idaas 中拿到的 client-secret
+                        scope:
+                          - openid
                 provider:
                     aliyunidaas:  # aliyunidaas 即为 {registrationId}, 可为任意字符串
                         issuer-uri: <issuer> # idaas 中拿到的 issuer
