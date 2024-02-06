@@ -115,25 +115,6 @@ spring:
 </dependency>
 ```
 
-- 日志相关，切换 logback 为 log4j2
-
-```xml
-  <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <exclusions>
-          <exclusion>
-              <groupId>org.springframework.boot</groupId>
-              <artifactId>spring-boot-starter-logging</artifactId>
-          </exclusion>
-      </exclusions>
-  </dependency>
-  <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-log4j2</artifactId>
-  </dependency>
-```
-
 ### 保护路径配置
 
 - 创建 SecurityConfig 类
